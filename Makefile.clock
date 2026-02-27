@@ -1,0 +1,111 @@
+ESC     := $(shell printf '\033')
+H_CHAR  := $(shell printf '\043')
+CYAN    := $(ESC)[1;96m
+YELLOW  := $(ESC)[1;93m
+GRAY    := $(ESC)[2;37m
+RESET   := $(ESC)[0m
+CLEAR   := $(ESC)[2J$(ESC)[H
+
+H       := $(shell date +%H)
+M       := $(shell date +%M)
+S       := $(shell date +%S)
+
+H0      := $(shell echo $(H) | cut -c1)
+H1      := $(shell echo $(H) | cut -c2)
+M0      := $(shell echo $(M) | cut -c1)
+M1      := $(shell echo $(M) | cut -c2)
+S0      := $(shell echo $(S) | cut -c1)
+S1      := $(shell echo $(S) | cut -c2)
+
+# H_CHAR = '#' (octal 043), . = space placeholder
+# Format: 5-character width, .=space, H_CHAR=filled block
+
+D       := $(H_CHAR)
+O       := .
+
+ROW_0_0 := $(O)$(D)$(D)$(D)$(O)
+ROW_0_1 := $(D)$(O)$(O)$(O)$(D)
+ROW_0_2 := $(D)$(O)$(O)$(O)$(D)
+ROW_0_3 := $(D)$(O)$(O)$(O)$(D)
+ROW_0_4 := $(O)$(D)$(D)$(D)$(O)
+
+ROW_1_0 := $(O)$(O)$(D)$(O)$(O)
+ROW_1_1 := $(O)$(D)$(D)$(O)$(O)
+ROW_1_2 := $(O)$(O)$(D)$(O)$(O)
+ROW_1_3 := $(O)$(O)$(D)$(O)$(O)
+ROW_1_4 := $(O)$(D)$(D)$(D)$(O)
+
+ROW_2_0 := $(D)$(D)$(D)$(D)$(O)
+ROW_2_1 := $(O)$(O)$(O)$(O)$(D)
+ROW_2_2 := $(O)$(D)$(D)$(D)$(O)
+ROW_2_3 := $(D)$(O)$(O)$(O)$(O)
+ROW_2_4 := $(D)$(D)$(D)$(D)$(D)
+
+ROW_3_0 := $(D)$(D)$(D)$(D)$(O)
+ROW_3_1 := $(O)$(O)$(O)$(O)$(D)
+ROW_3_2 := $(O)$(D)$(D)$(D)$(O)
+ROW_3_3 := $(O)$(O)$(O)$(O)$(D)
+ROW_3_4 := $(D)$(D)$(D)$(D)$(O)
+
+ROW_4_0 := $(D)$(O)$(O)$(O)$(D)
+ROW_4_1 := $(D)$(O)$(O)$(O)$(D)
+ROW_4_2 := $(D)$(D)$(D)$(D)$(D)
+ROW_4_3 := $(O)$(O)$(O)$(O)$(D)
+ROW_4_4 := $(O)$(O)$(O)$(O)$(D)
+
+ROW_5_0 := $(D)$(D)$(D)$(D)$(D)
+ROW_5_1 := $(D)$(O)$(O)$(O)$(O)
+ROW_5_2 := $(D)$(D)$(D)$(D)$(O)
+ROW_5_3 := $(O)$(O)$(O)$(O)$(D)
+ROW_5_4 := $(D)$(D)$(D)$(D)$(O)
+
+ROW_6_0 := $(O)$(D)$(D)$(D)$(O)
+ROW_6_1 := $(D)$(O)$(O)$(O)$(O)
+ROW_6_2 := $(D)$(D)$(D)$(D)$(O)
+ROW_6_3 := $(D)$(O)$(O)$(O)$(D)
+ROW_6_4 := $(O)$(D)$(D)$(D)$(O)
+
+ROW_7_0 := $(D)$(D)$(D)$(D)$(D)
+ROW_7_1 := $(O)$(O)$(O)$(O)$(D)
+ROW_7_2 := $(O)$(O)$(O)$(D)$(O)
+ROW_7_3 := $(O)$(O)$(D)$(O)$(O)
+ROW_7_4 := $(O)$(O)$(D)$(O)$(O)
+
+ROW_8_0 := $(O)$(D)$(D)$(D)$(O)
+ROW_8_1 := $(D)$(O)$(O)$(O)$(D)
+ROW_8_2 := $(O)$(D)$(D)$(D)$(O)
+ROW_8_3 := $(D)$(O)$(O)$(O)$(D)
+ROW_8_4 := $(O)$(D)$(D)$(D)$(O)
+
+ROW_9_0 := $(O)$(D)$(D)$(D)$(O)
+ROW_9_1 := $(D)$(O)$(O)$(O)$(D)
+ROW_9_2 := $(O)$(D)$(D)$(D)$(D)
+ROW_9_3 := $(O)$(O)$(O)$(O)$(D)
+ROW_9_4 := $(O)$(D)$(D)$(D)$(O)
+
+COL_0 := $(O)$(O)$(O)
+COL_1 := $(O)$(D)$(O)
+COL_2 := $(O)$(O)$(O)
+COL_3 := $(O)$(D)$(O)
+COL_4 := $(O)$(O)$(O)
+
+define RENDER_ROW
+	@line='$(ROW_$(H0)_$(1)) $(ROW_$(H1)_$(1))  $(COL_$(1))  $(ROW_$(M0)_$(1)) $(ROW_$(M1)_$(1))  $(COL_$(1))  $(ROW_$(S0)_$(1)) $(ROW_$(S1)_$(1))'; \
+	line=$$(echo "$$line" | sed 's/\./ /g; s/$(H_CHAR)/█/g'); \
+	printf '  $(CYAN)%s$(RESET)\n' "$$line"
+endef
+
+.PHONY: clock _draw
+
+clock:
+	@while true; do $(MAKE) --no-print-directory -f $(lastword $(MAKEFILE_LIST)) _draw; sleep 1; done
+
+_draw:
+	@printf '$(CLEAR)'
+	$(call RENDER_ROW,0)
+	$(call RENDER_ROW,1)
+	$(call RENDER_ROW,2)
+	$(call RENDER_ROW,3)
+	$(call RENDER_ROW,4)
+	@printf '\n$(GRAY)        $(shell date "+%Y-%m-%d  %A")$(RESET)\n'
+	@printf '\n$(GRAY)          Press Ctrl+C to exit$(RESET)\n'
