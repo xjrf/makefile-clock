@@ -1,5 +1,7 @@
 # Terminal Clock
 
+![Demo](assets/demo.png)
+
 A terminal clock written in GNU Make.  
 It renders `HH:MM:SS` as large block digits and refreshes every second.
 
