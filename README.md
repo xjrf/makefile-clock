@@ -1,4 +1,4 @@
-# Terminal Clock
+# Makefile Clock
 
 ![Demo](assets/demo.png)
 
